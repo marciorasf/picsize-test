@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 app.use("/api", Routes);
 
 app.all("*", function (req, res) {
-  res.send("route not mapped");
+  res.send("Rota não mapeada.");
 });
 
 const server = app.listen(apiPort || 8080, function () {

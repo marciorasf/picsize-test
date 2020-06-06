@@ -136,7 +136,35 @@ const efetivarEmprestimo = async (req, res) => {
   }
 };
 
+const getEmprestimosSolicitados = async (req, res) => {
+  try {
+    fs.exists("./dados.json", function (exists) {
+      if (exists) {
+        fs.readFile("./dados.json", "utf8", function (err, data) {
+          if (err) {
+            throw "Erro ao ler arquivo dados.json.";
+          }
+
+          const dados = JSON.parse(data);
+          res.status(200).json({
+            mensagem: "Dados disponibilizados.",
+            ...dados,
+          });
+        });
+      } else {
+        throw "Não há dados armazenados.";
+      }
+    });
+  } catch (err) {
+    res.status(400).json({
+      mensagem: "Erro ao recuperar dados.",
+      erro: err,
+    });
+  }
+};
+
 module.exports = {
   simularEmprestimo,
   efetivarEmprestimo,
+  getEmprestimosSolicitados,
 };
