@@ -1,17 +1,11 @@
-const jurosPorEstado = {
-	MG: 0.01,
-	SP: 0.008,
-	RJ: 0.009,
-	ES: 0.0111
-}
+const simularEmprestimo = async (req, res) => {
+  const validezDados = dadosFormularioSaoValidos(req.body);
+  if (validezDados.valido) {
+    const { body } = req;
+    const { valorRequerido, mesesParaPagar, CPF, UF, dataNascimento } = body;
 
-const jurosOutrosEstados = 0.01;
-
-const simularEmprestimo = async ( req, res ) => {
-  if (dadosFormularioSaoValidos(req)) {
-    const { valorRequerido, mesesParaPagar } = req.body;
-    const taxaJuros = 0.01;
-    const taxajurosPorcentagem = formatarNumeroVirgulaFlutuante(taxaJuros * 100) + '%';
+    const taxaJuros = getJurosUF(UF);
+    const taxajurosPorcentagem = taxaJuros * 100;
     const total = (valorRequerido * (1 + taxaJuros) ** mesesParaPagar).toFixed(2);
     const valorParcela = (total / mesesParaPagar).toFixed(2);
 
@@ -19,13 +13,13 @@ const simularEmprestimo = async ( req, res ) => {
     const dataParcelas = [];
 
     // Apenas para evitar dias que nao estejam presentes em todos os meses
-		const diaPagamento = dataHoje.getDate() <= 27 ? dataHoje.getDate() + 1 : 28;
-		
+    const diaPagamento = dataHoje.getDate() <= 27 ? dataHoje.getDate() + 1 : 28;
+
     // Comecara a pagar no proximo mes
-		let mesPagamento = dataHoje.getMonth() + 1 + 1;
-		
-		let anoPagamento = dataHoje.getFullYear();
-		
+    let mesPagamento = dataHoje.getMonth() + 1 + 1;
+
+    let anoPagamento = dataHoje.getFullYear();
+
     for (indiceParcela = 0; indiceParcela < mesesParaPagar; indiceParcela++) {
       dataParcelas.push(
         `${diaPagamento <= 9 ? "0" + diaPagamento : diaPagamento}/${
@@ -42,38 +36,94 @@ const simularEmprestimo = async ( req, res ) => {
 
     res.status(200).json({
       data: {
+        ...body,
+        UF,
         valorRequerido: formatarNumeroDinheiro(valorRequerido),
         mesesParaPagar,
-        taxaJuros: taxajurosPorcentagem,
+        taxaJuros: formatarNumeroVirgulaFlutuante(formatarCasasDecimais(taxajurosPorcentagem)) + "%",
         valorParcela: formatarNumeroDinheiro(valorParcela),
         dataParcelas,
-        total: formatarNumeroDinheiro(total),
+        valorTotal: formatarNumeroDinheiro(total),
       },
-      message: "simulacao ok",
+      mensagem: "simulacao ok",
     });
   } else {
     res.status(400).json({
-      message: "Dados inválidos",
+      mensagem: validezDados.msg,
     });
   }
 };
 
-let dadosFormularioSaoValidos = (dados) => {
-  return true;
+const jurosPorEstado = {
+  MG: 0.01,
+  SP: 0.008,
+  RJ: 0.009,
+  ES: 0.0111,
+};
+
+const jurosOutrosEstados = 0.01;
+
+const getJurosUF = (UF) => {
+  if (jurosPorEstado.hasOwnProperty(UF)) return jurosPorEstado[UF];
+  else return jurosOutrosEstados;
+};
+
+const dadosFormularioSaoValidos = (dados) => {
+  const { CPF, mesesParaPagar, valorRequerido } = dados;
+  const objetoDadosInvalidos = (msg) => ({
+    valido: false,
+    msg,
+  });
+  if (CPF.length < 9) return objetoDadosInvalidos("CPF inválido.");
+
+  if (mesesParaPagar > 30 * 12) return objetoDadosInvalidos("O prazo máximo para pagamento é 30 anos (360 meses).");
+
+  if (mesesParaPagar <= 0) return objetoDadosInvalidos("O empréstimo deve ser pago em no mínimo 1 mês.");
+
+  if (valorRequerido < 50000) return objetoDadosInvalidos("O valor requerido mínimo é R$ 50000,00");
+
+  return { valido: true };
 };
 
 const formatarNumeroDinheiro = (numero) => {
-  return "R$" + parseFloat(numero).toFixed(2).replace(".", ",");
+  return "R$ " + formatarCasasDecimais(numero).replace(".", ",");
 };
 
 const formatarNumeroVirgulaFlutuante = (numero) => {
   return numero.toString().replace(".", ",");
 };
 
+const formatarCasasDecimais = (numero) => {
+  return parseFloat(numero).toFixed(2);
+};
+
+const fs = require("fs");
+
 const efetivarEmprestimo = async (req, res) => {
-  res.status(200).json({
-    message: "emprestimo efetivado",
-  });
+  const { body } = req;
+  try {
+    fs.readFile("./dados.json", "utf8", function (err, data) {
+      if (err) {
+        throw "Erro ao ler arquivo dados.json.";
+      }
+
+      let jsonAntigo = JSON.parse(data);
+      jsonAntigo.dados.push(body);
+      jsonAntigo = JSON.stringify(jsonAntigo);
+
+      fs.writeFile("./dados.json", jsonAntigo, (err) => {
+        if (err) throw "Erro ao escrever arquivo dados.json.";
+      });
+    });
+    res.status(200).json({
+      mensagem: "Empréstimo solicitado.",
+    });
+  } catch (err) {
+    res.status(400).json({
+      mensagem: "Erro ao solicitar empréstimo.",
+      erro: err,
+    });
+  }
 };
 
 module.exports = {
