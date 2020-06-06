@@ -102,19 +102,29 @@ const fs = require("fs");
 const efetivarEmprestimo = async (req, res) => {
   const { body } = req;
   try {
-    fs.readFile("./dados.json", "utf8", function (err, data) {
-      if (err) {
-        throw "Erro ao ler arquivo dados.json.";
+    fs.exists("./dados.json", function (exists) {
+      if (exists) {
+        fs.readFile("./dados.json", "utf8", function (err, data) {
+          if (err) {
+            throw "Erro ao ler arquivo dados.json.";
+          }
+
+          let jsonAntigo = JSON.parse(data);
+          jsonAntigo.dados.push(body);
+          jsonAntigo = JSON.stringify(jsonAntigo);
+
+          fs.writeFile("./dados.json", jsonAntigo, (err) => {
+            if (err) throw "Erro ao escrever arquivo dados.json.";
+          });
+        });
+      } else {
+        let novoJson = JSON.stringify({ dados: [body] });
+        fs.writeFile("./dados.json", novoJson, (err) => {
+          if (err) throw "Erro ao escrever arquivo dados.json.";
+        });
       }
-
-      let jsonAntigo = JSON.parse(data);
-      jsonAntigo.dados.push(body);
-      jsonAntigo = JSON.stringify(jsonAntigo);
-
-      fs.writeFile("./dados.json", jsonAntigo, (err) => {
-        if (err) throw "Erro ao escrever arquivo dados.json.";
-      });
     });
+
     res.status(200).json({
       mensagem: "Empréstimo solicitado.",
     });
