@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { BrowserRouter } from "react-router-dom";
 import Routes from "./routes";
+import { DataProvider } from "../contexts";
 
 import { CssBaseline } from "@material-ui/core";
 
@@ -10,8 +11,10 @@ class App extends Component {
   render() {
     return (
       <BrowserRouter>
-        <CssBaseline />
-        <Routes />
+        <DataProvider>
+          <CssBaseline />
+          <Routes />
+        </DataProvider>
       </BrowserRouter>
     );
   }

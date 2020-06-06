@@ -1,4 +1,6 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useState, useContext, useEffect } from "react";
+import api from "../services";
+import { DataContext } from "../contexts";
 
 import { makeStyles } from "@material-ui/core/styles";
 import {
@@ -10,7 +12,10 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  Snackbar,
 } from "@material-ui/core";
+import MuiAlert from "@material-ui/lab/Alert";
+import { ArrowForward as ArrowForwardIcon } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -28,30 +33,63 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
   },
   label: {
-    fontSize: "0.75rem",
+    fontSize: 12,
     fontWeight: 900,
+    color: "#858585",
   },
   value: {
-    fontSize: "1.25rem",
+    fontSize: 20,
     fontWeight: 500,
+  },
+  table: {
+    maxHeight: "50vh",
+    marginTop: theme.spacing(1.5),
+  },
+  tableCellTotal: {
+    fontWeight: 900,
+    color: "#444444",
   },
 }));
 
+function Alert(props) {
+  return <MuiAlert elevation={6} variant='filled' {...props} />;
+}
+
 export default function Simulacao(props) {
   const classes = useStyles();
+  const { dadosCliente } = useContext(DataContext);
 
-  const [infoSimulacao, setInfoSimulacao] = useState({});
+  useEffect(() => {
+    if (!dadosCliente.hasOwnProperty("CPF")) props.history.push("/");
+  });
 
-  const parcelas = [
-    { data: "20/07/1998", valor: "R$ 34 000,46" },
-    { data: "21/07/1998", valor: "R$ 34 000,46" },
-    { data: "22/07/1998", valor: "R$ 34 000,46" },
-    { data: "23/07/1998", valor: "R$ 34 000,46" },
-  ];
+  const [alerta, setAlerta] = useState({ aberto: false, tipo: "success", msg: "minha msg" });
+
+  const abrirAlerta = (tipo = undefined, msg = undefined) => {
+    setAlerta({ ...alerta, aberto: true, tipo, msg });
+  };
+
+  const fecharAlerta = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setAlerta({ ...alerta, aberto: false });
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log(infoSimulacao);
+    api
+      .efetivarEmprestimo(dadosCliente)
+      .then((res) => {
+        console.log(res);
+        console.log(res.data);
+        abrirAlerta("success", res.data.mensagem);
+      })
+      .catch((err) => {
+        console.log(err);
+        abrirAlerta("error", err.response.data.mensagem);
+      });
   };
 
   return (
@@ -61,42 +99,65 @@ export default function Simulacao(props) {
           <Grid container spacing={4}>
             <Grid item xs={6} className={classes.gridTwoRows}>
               <span className={classes.label}>VALOR REQUERIDO:</span>
-              <span className={classes.value}>R$ 100.000,00</span>
+              <span className={classes.value}>{dadosCliente.valorRequerido}</span>
             </Grid>
             <Grid item xs={6} className={classes.gridTwoRows}>
               <span className={classes.label}>TAXA DE JUROS:</span>
-              <span className={classes.value}>1%</span>
+              <span className={classes.value}>{dadosCliente.taxaJuros}</span>
             </Grid>
             <Grid item xs={12} className={classes.gridTwoRows}>
               <span className={classes.label}>PAGAR EM:</span>
-              <span className={classes.value}>3 meses</span>
+              <span className={classes.value}>{dadosCliente.mesesParaPagar} meses</span>
             </Grid>
             <Grid item xs={12} className={classes.gridTwoRows}>
               <span className={classes.label}>PROJEÇÃO DAS PARCELAS:</span>
-              <TableContainer>
+              <TableContainer className={classes.table}>
                 <Table className={classes.table} size='small'>
                   <TableBody>
-                    {parcelas.map((row) => (
-                      <TableRow key={row.data}>
-                        <TableCell scope='row'>{row.data}</TableCell>
-                        <TableCell align='right'>{row.valor}</TableCell>
-                      </TableRow>
-                    ))}
+                    {dadosCliente.dataParcelas
+                      ? dadosCliente.dataParcelas.map((data) => (
+                          <TableRow key={data}>
+                            <TableCell scope='row'>{data}</TableCell>
+                            <TableCell align='right'>{dadosCliente.valorParcela}</TableCell>
+                          </TableRow>
+                        ))
+                      : null}
                     <TableRow key='total'>
-                      <TableCell scope='row'>Total</TableCell>
-                      <TableCell align='right'>Total</TableCell>
+                      <TableCell scope='row' className={classes.tableCellTotal}>
+                        TOTAL
+                      </TableCell>
+                      <TableCell align='right' className={classes.tableCellTotal}>
+                        {dadosCliente.valorTotal}
+                      </TableCell>
                     </TableRow>
                   </TableBody>
                 </Table>
               </TableContainer>
             </Grid>
             <Grid item xs={12} className={classes.gridTwoRows}>
-              <Button type='submit' variant='contained' fullWidth color='primary' className={classes.firstButton}>
+              <Button
+                type='submit'
+                variant='contained'
+                fullWidth
+                color='primary'
+                className={classes.firstButton}
+                endIcon={<ArrowForwardIcon />}
+              >
                 EFETIVAR O EMPRÉSTIMO
               </Button>
             </Grid>
           </Grid>
         </form>
+        <Snackbar
+          open={alerta.aberto}
+          autoHideDuration={6000}
+          onClose={fecharAlerta}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        >
+          <Alert onClose={fecharAlerta} severity={alerta.tipo}>
+            {alerta.msg}
+          </Alert>
+        </Snackbar>
       </Container>
     </Fragment>
   );
