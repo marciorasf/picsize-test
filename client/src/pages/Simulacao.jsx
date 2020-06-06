@@ -15,7 +15,7 @@ import {
   Snackbar,
 } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
-import { ArrowForward as ArrowForwardIcon } from "@material-ui/icons";
+import { ArrowForward as ArrowForwardIcon, ArrowBack as ArrowBackIcon } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
   form: {
@@ -53,7 +53,7 @@ function Alert(props) {
 
 export default function Simulacao(props) {
   const classes = useStyles();
-  const { dadosCliente } = useContext(DataContext);
+  const { dadosCliente, salvarDadosCliente } = useContext(DataContext);
 
   useEffect(() => {
     if (!dadosCliente.hasOwnProperty("CPF")) props.history.push("/");
@@ -86,6 +86,11 @@ export default function Simulacao(props) {
         console.log(err);
         abrirAlerta("error", err.response.data.mensagem);
       });
+  };
+
+  const fazerOutraSimulacao = () => {
+    salvarDadosCliente({ ...dadosCliente, valorRequerido: null, mesesParaPagar: null });
+    props.history.push("/");
   };
 
   return (
@@ -130,7 +135,7 @@ export default function Simulacao(props) {
                 </Table>
               </TableContainer>
             </Grid>
-            <Grid item xs={12} className={classes.gridTwoRows}>
+            <Grid item xs={12}>
               <Button
                 type='submit'
                 variant='contained'
@@ -140,6 +145,18 @@ export default function Simulacao(props) {
                 endIcon={<ArrowForwardIcon />}
               >
                 EFETIVAR O EMPRÉSTIMO
+              </Button>
+            </Grid>
+            <Grid item xs={12}>
+              <Button
+                type='button'
+                variant='contained'
+                fullWidth
+                color='secondary'
+                startIcon={<ArrowBackIcon />}
+                onClick={fazerOutraSimulacao}
+              >
+                FAZER OUTRA SIMULAÇÃO
               </Button>
             </Grid>
           </Grid>
