@@ -23,7 +23,7 @@ import MuiAlert from "@material-ui/lab/Alert";
 
 const useStyles = makeStyles((theme) => ({
   form: {
-    margin: theme.spacing(6,2),
+    margin: theme.spacing(6, 2),
   },
   firstButton: {
     marginTop: theme.spacing(1),
@@ -36,7 +36,7 @@ function Alert(props) {
 
 export default function Formulario(props) {
   const classes = useStyles();
-  const { salvarDadosCliente } = useContext(DataContext);
+  const { dadosCliente, salvarDadosCliente } = useContext(DataContext);
   const [infoFormulario, setInfoFormulario] = useState({});
   const [alerta, setAlerta] = useState({ aberto: false, tipo: "success", msg: "minha msg" });
 
@@ -118,12 +118,20 @@ export default function Formulario(props) {
                 label='CPF'
                 onChange={handleInputChange}
                 autoFocus
+                value={dadosCliente.CPF}
               />
             </Grid>
             <Grid item xs={12}>
               <FormControl variant='outlined' fullWidth>
                 <InputLabel id='uf-select-label'>UF</InputLabel>
-                <Select labelId='uf-select-label' label='UF' onChange={handleInputChange} defaultValue='' name='UF'>
+                <Select
+                  labelId='uf-select-label'
+                  label='UF'
+                  onChange={handleInputChange}
+                  defaultValue=''
+                  name='UF'
+                  value={dadosCliente.UF}
+                >
                   {UFs.map((uf) => (
                     <MenuItem key={uf} value={uf}>
                       {uf}
@@ -145,6 +153,7 @@ export default function Formulario(props) {
                   required
                   InputAdornmentProps={{ position: "end" }}
                   onChange={(date) => handleInputChange({ target: { value: date, name: "dataNascimento" } })}
+                  value={dadosCliente.dataNascimento}
                 />
               </MuiPickersUtilsProvider>
             </Grid>
