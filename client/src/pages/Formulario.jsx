@@ -22,12 +22,8 @@ import {
 import MuiAlert from "@material-ui/lab/Alert";
 
 const useStyles = makeStyles((theme) => ({
-  paper: {
-    margin: theme.spacing(6, 1, 2, 1),
-    display: "flex",
-  },
   form: {
-    margin: theme.spacing(5, 2),
+    margin: theme.spacing(6,2),
   },
   firstButton: {
     marginTop: theme.spacing(1),
