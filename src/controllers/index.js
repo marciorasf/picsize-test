@@ -2,7 +2,7 @@ const simularEmprestimo = async (req, res) => {
   const validezDados = dadosFormularioSaoValidos(req.body);
   if (validezDados.valido) {
     const { body } = req;
-    const { valorRequerido, mesesParaPagar, CPF, UF, dataNascimento } = body;
+    const { valorRequerido, mesesParaPagar, UF } = body;
 
     const taxaJuros = getJurosUF(UF);
     const taxajurosPorcentagem = taxaJuros * 100;
