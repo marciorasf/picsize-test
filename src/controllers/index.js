@@ -22,8 +22,7 @@ const simularEmprestimo = async (req, res) => {
 
     for (indiceParcela = 0; indiceParcela < mesesParaPagar; indiceParcela++) {
       dataParcelas.push(
-        `${diaPagamento <= 9 ? "0" + diaPagamento : diaPagamento}/${
-          mesPagamento <= 9 ? "0" + mesPagamento : mesPagamento
+        `${diaPagamento <= 9 ? "0" + diaPagamento : diaPagamento}/${mesPagamento <= 9 ? "0" + mesPagamento : mesPagamento
         }/${anoPagamento}`,
       );
 
