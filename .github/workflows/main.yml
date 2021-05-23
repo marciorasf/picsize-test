@@ -31,4 +31,3 @@ jobs:
         push-branch: caprover-releases
         # Specify commit message
         commit-message: change image tag to ${{github.run_id}}
-        files: captain-definition
