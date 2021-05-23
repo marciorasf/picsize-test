@@ -35,7 +35,7 @@ jobs:
     needs: [build]
     
     runs-on: ubuntu-latest
-    
+        
     steps:
     - uses: actions/checkout@v2
       with:
@@ -48,15 +48,9 @@ jobs:
         field: imageName
         value: ${{secrets.DOCKER_USER}}/picsize-test-api:${{ github.run_id }}
         
-    - name: Git Commit and Push
-    # You may pin to the exact commit or the version.
-    # uses: github-actions-x/commit@5cf7985b07155682f82d02b6c2188d90cebeb0c8
-      uses: github-actions-x/commit@v2.8
+    - name: Git Commit/Push Changes
+      uses: actions-x/commit@v2
       with:
-        # Github Token with commit access
-        github-token:  ${{ github.token }}
-        # Override branch to push to
-        push-branch: caprover-releases
-        # Specify commit message
-        commit-message: change image tag to ${{github.run_id}}
-        files: captain-definition
+        message: update image tag to ${{ github.run_id }}
+        branch: caprover-releases
+        
