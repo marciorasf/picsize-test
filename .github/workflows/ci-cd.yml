@@ -48,11 +48,12 @@ jobs:
         field: imageName
         value: ${{secrets.DOCKER_USER}}/picsize-test-api:${{ github.run_id }}
         
-    - name: Git Commit/Push Changes
-      uses: actions-x/commit@v2
+    - name: Git Commit and Push
+      uses: github-actions-x/commit@v2.8
       with:
-        message: update image tag to ${{ github.run_id }}
-        branch: caprover-releases
-        force: true
-
-        
+        github-token: ${{github.token}}
+        push-branch: caprover-releases
+        commit-message: update image tag to ${{ github.run_id }}
+        force-push: true
+        rebase: true
+        files: captain-definition 
