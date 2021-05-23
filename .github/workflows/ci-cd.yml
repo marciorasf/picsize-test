@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: CI/CD
 
 # Controls when the action will run. 
 on:
@@ -42,7 +42,15 @@ jobs:
         # uses: docker/build-push-action@e1b7f96249f2e4c8e4ac1519b9608c0d48944a1f
         uses: docker/build-push-action@v2.4.0
         with:
+          # Build's context is the set of files located in the specified PATH or URL
+          context: .
+          # Path to the Dockerfile
+          file: ./Dockerfile
+          # Push is a shorthand for --output=type=registry
+          push: true
+          # List of tags
           tags: |
-            marciorasf/picsize-test-api:${{env.GITHUB_RUN_NUMBER}}
-            marciorasf/picsize-test-api:latest
+            ${{secrets.DOCKER_USER}}/picsize-test-api:${{ github.run_id }}
+            ${{secrets.DOCKER_USER}}/picsize-test-api:latest
+          github-token: ${{ github.token }}
 

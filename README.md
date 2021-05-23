@@ -1,4 +1,4 @@
-# PicSize Test Web
+# PicSize Test API
 
 This repo contains the backend of Picsize's admission test.
 
