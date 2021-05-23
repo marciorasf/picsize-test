@@ -49,6 +49,8 @@ jobs:
           # Push is a shorthand for --output=type=registry
           push: true
           # List of tags
-          tags: marciorasf/picsize-test-api:latest
+          tags: |
+            marciorasf/picsize-test-api:${{ env.GITHUB_RUN_NUMBER }}
+            marciorasf/picsize-test-api:latest
           github-token: ${{ github.token }}
 
