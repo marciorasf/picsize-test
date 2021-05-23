@@ -27,7 +27,7 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Run a one-line script
-        run: echo ${{ env.GITHUB_RUN_NUMBER }}
+        run: echo ${{ github.run_id }}
 
       # Runs a set of commands using the runners shell
       - name: Run a multi-line script
