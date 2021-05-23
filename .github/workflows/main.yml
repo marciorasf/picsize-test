@@ -50,7 +50,7 @@ jobs:
           push: true
           # List of tags
           tags: |
-            marciorasf/picsize-test-api:${{ github.run_id }}
-            marciorasf/picsize-test-api:latest
+            ${{secrets.DOCKER_USER}}/picsize-test-api:${{ github.run_id }}
+            ${{secrets.DOCKER_USER}}/picsize-test-api:latest
           github-token: ${{ github.token }}
 
