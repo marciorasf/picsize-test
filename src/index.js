@@ -16,4 +16,9 @@ const server = app.listen(apiPort, function () {
   console.log("App now running on port", port);
 });
 
+// Exit on docker stop
+process.on('SIGINT', () => {
+  process.exit(0)
+})
+
 module.exports = server;
