@@ -21,13 +21,3 @@ jobs:
         file: captain-definition
         field: imageName
         value: ${{secrets.DOCKER_USER}}/picsize-test-api:${{ github.run_id }}
-        
-    - name: Git Commit and Push
-      uses: github-actions-x/commit@v2.8
-      with:
-        # Github Token with commit access
-        github-token:  ${{ github.token }}
-        # Override branch to push to
-        push-branch: caprover-releases
-        # Specify commit message
-        commit-message: change image tag to ${{github.run_id}}
