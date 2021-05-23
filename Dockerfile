@@ -9,8 +9,8 @@ RUN yarn
 
 COPY . .
 
-ENV PORT=80
+ENV PORT=3000
 
-EXPOSE 80
+EXPOSE 3000
 
 CMD ["node", "./src/index"]
