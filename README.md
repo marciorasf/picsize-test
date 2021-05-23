@@ -1,17 +1,11 @@
-# PicSize admission technical test
+# PicSize Test Web
 
-The test scope was building a web application to simulate a bank loan.
+This repo contains the backend of Picsize's admission test.
 
-The project consists in a React.js frontend where the user can interact with the app connected to a Node.js REST API backend where the calculations are made.
+You can check the live version on [picsize-test](picsize-test.marciorasf.space).
 
-The codes are written in portuguese due to test requirements.
+The frontend can be found on [picsize-test-api](https://github.com/marciorasf/picsize-test-web).
 
-## How to run
+The test consisted in creating a tool to simulate a loan for a person. At the end of the simulation, the person could fullfill the loan process. The loans made should be stored on a JSON that can be requested using a backend's endpoint. The endpoint is [/emprestimosSolicitados](https://marciorasf.space).
 
-```bash
-# run backend
-cd server && npm run start
-
-# run fronted
-cd client && npm run start
-```
+The backend is a REST API implemented in Node.js using Express.js framework.
